@@ -1,0 +1,137 @@
+<?php
+
+/*
+	@author UCB IT WebServices, May 28th 2015
+	
+	This is a basic health check page that is monitored by SCOM.
+	
+	Checks if the database is reachable and we can run a query.
+	Checks if the default Drupal files folder is reachable and writeable.
+	
+	SCOM checks for the STATUS_OK string to be present in the page.
+	The STATUS_OK string is included only if all health checks pass.
+	
+*/
+
+define('STATUS_OK', '<!-- SCOM HEALTH CHECK STATUS OK -->');
+define('STATUS_ERR', '<!-- SCOM HEALTH CHECK STATUS ERR -->');
+
+/*
+ * Implements hook_menu
+ */
+function ubc_healthcheck_menu() {
+
+	$items['healthcheck/scom'] = array(
+		'title' => 'UBC HealthCheck for SCOM',
+		'description' => 'A page for SCOM to test the status of a site',
+		'page callback' => 'ubc_healthcheck_scom',
+		'access arguments' => array('access content'),
+	);
+
+	return $items;
+}
+
+/*
+ * Performs health checks and returns page html
+ */
+function ubc_healthcheck_scom() {
+
+	# we never want to cache the results of the check
+	drupal_page_is_cacheable(FALSE);
+
+	$db_status = _ubc_healthcheck_getDBStatus();
+	$files_status = _ubc_healthcheck_getFilesStatus();
+
+	# do other types of status checks here
+	
+	$html = '<div id="statuses">';
+	$html .= _ubc_healthcheck_setDBStatusHTML($db_status);
+	$html .= _ubc_healthcheck_setFileStatusHTML($files_status);
+	$html .= '</div>';
+
+	$html .= _ubc_healthcheck_insertStatusString(array($db_status, $files_status));
+	return $html;
+
+}
+
+/*
+ * Test the DB connection by querying the node table
+ */
+function _ubc_healthcheck_getDBStatus() {
+
+	try {
+	  $result = db_query('SELECT COUNT(nid) AS ok FROM {node}')->fetch();
+	  return $result->ok;
+	}
+	catch (Exception $e) {
+		return $e;
+	}
+	return FALSE;
+}
+
+/* 
+ * Return the status of the DB connection test
+ * @return $html string
+ */
+function _ubc_healthcheck_setDBStatusHTML(&$db_status) {
+
+	$html  = '<h3>DB Connection:</h3>';
+	if(is_numeric($db_status)) {
+		$html .= '<div class="check-ok">Connected</div>';
+	}
+	elseif(is_object($db_status)) {
+		$html .= '<div class="check-down">PDOException</div>';
+	}
+	else {
+		$html .= '<div class="check-down">Error</div>';
+	}
+	return $html;
+}
+
+/*
+ * Test the File system
+ */
+function _ubc_healthcheck_getFilesStatus() {
+
+  try {  
+  	$files_path = variable_get('file_public_path', conf_path() . '/files');
+  	if(is_writable($files_path)) {
+			return 1;  	
+  	}
+  }
+  catch(Exception $e) {
+    return $e;
+  }
+  return FALSE;
+}
+
+/* 
+ * Return the status of the File directory test
+ * @return $html string
+ */
+function _ubc_healthcheck_setFileStatusHTML(&$files_status) {
+
+	$html  = '<h3>File System:</h3>';
+	if(is_numeric($files_status)) {
+		$html .= '<div class="check-ok">Writeable</div>';
+	}
+	elseif(is_object($files_status)) {
+		$html .= '<div class="check-down">Exception</div>';
+	}
+	else {
+		$html .= '<div class="check-down">Error</div>';
+	}
+	return $html;
+}
+
+/*
+ * Test all status checks and return SCOM status string
+ */
+function _ubc_healthcheck_insertStatusString($status_array) {
+
+	foreach($status_array as $status) {
+		if(!is_numeric($status)) return STATUS_ERR;
+	}
+	return STATUS_OK;
+}
+
