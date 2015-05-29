@@ -1,5 +1,5 @@
 # ubc_healthcheck
-Drupal modules that creates a page for monitoring systems to test the status of a site
+Drupal module that creates a page for monitoring systems to test the status of a site
 
 @author UCB IT WebServices, May 28th 2015
 	
