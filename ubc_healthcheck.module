@@ -13,8 +13,9 @@
 	
 */
 
-define('STATUS_OK', '<!-- SCOM HEALTH CHECK STATUS OK -->');
-define('STATUS_ERR', '<!-- SCOM HEALTH CHECK STATUS ERR -->');
+define('STATUS_OK', 	'<!-- SCOM HEALTH CHECK STATUS OK -->');
+define('STATUS_ERR', 	'<!-- SCOM HEALTH CHECK STATUS ERR -->');
+define('CLF_ASSET_URL', 'http://cdn.ubc.ca/clf/7.0.4/js/ubc-clf.min.js');
 
 /*
  * Implements hook_menu
@@ -41,15 +42,17 @@ function ubc_healthcheck_scom() {
 
 	$db_status = _ubc_healthcheck_getDBStatus();
 	$files_status = _ubc_healthcheck_getFilesStatus();
+	$theme_status = _ubc_healthcheck_getThemeStatus();
 
 	# do other types of status checks here
 	
 	$html = '<div id="statuses">';
 	$html .= _ubc_healthcheck_setDBStatusHTML($db_status);
 	$html .= _ubc_healthcheck_setFileStatusHTML($files_status);
+	$html .= _ubc_healthcheck_setThemeStatus($theme_status);
 	$html .= '</div>';
 
-	$html .= _ubc_healthcheck_insertStatusString(array($db_status, $files_status));
+	$html .= _ubc_healthcheck_insertStatusString(array($db_status, $files_status, $theme_status));
 	return $html;
 
 }
@@ -124,6 +127,62 @@ function _ubc_healthcheck_setFileStatusHTML(&$files_status) {
 	return $html;
 }
 
+function _ubc_healthcheck_getThemeStatus() {
+
+  try {  
+  	$themes = list_themes(TRUE);
+	if(array_key_exists('megatron', $themes)) {
+	  if($themes['megatron']->status == 1) {
+	    return _ubc_healthcheck_megatronStatus();
+	  }
+	}
+	return -1;
+
+  }
+  catch(Exception $e) {
+    return $e;
+  }
+  return FALSE;
+}
+
+function _ubc_healthcheck_setThemeStatus(&$theme_status) {
+
+#return '<xmp>'.print($theme_status).'</xmp>';
+
+	$html  = '<h3>CLF THEME:</h3>';
+	if(is_numeric($theme_status)) {
+	  if($theme_status == 1) $html .= '<div class="check-ok">CLF Assets Available</div>';
+      if($theme_status == -1) $html .= '<div class="check-ok">CLF Theme Not Installed</div>';
+	}
+	elseif(is_object($theme_status)) {
+		$html .= '<div class="check-down">Exception</div>';
+	}
+	else {
+		$html .= '<div class="check-down">Error</div>';
+	}
+	return $html;
+}
+
+function _ubc_healthcheck_megatronStatus() {
+
+  $curl = curl_init(CLF_ASSET_URL);
+  curl_setopt($curl, CURLOPT_NOBODY, true);
+
+  $result = curl_exec($curl);
+  $ret = false;
+
+  if($result !== false) {
+    $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);  
+
+      if($statusCode == 200) {
+        $ret = 1;
+      }
+  }
+
+  curl_close($curl);
+  return $ret;  
+}
+
 /*
  * Test all status checks and return SCOM status string
  */
@@ -134,4 +193,3 @@ function _ubc_healthcheck_insertStatusString($status_array) {
 	}
 	return STATUS_OK;
 }
-
