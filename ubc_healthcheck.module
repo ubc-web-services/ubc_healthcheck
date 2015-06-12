@@ -38,6 +38,14 @@ function ubc_healthcheck_menu() {
  */
 function ubc_healthcheck_scom() {
 
+  	# do not track this script via New Relic
+  	if(extension_loaded('newrelic')) {
+	  newrelic_ignore_transaction();
+	  newrelic_disable_autorum();
+	}
+
+	$start = microtime();
+
 	# we never want to cache the results of the check
 	drupal_page_is_cacheable(FALSE);
 
@@ -52,6 +60,9 @@ function ubc_healthcheck_scom() {
 	$html .= _ubc_healthcheck_setFileStatusHTML($files_status);
 	$html .= _ubc_healthcheck_setThemeStatus($theme_status);
 	$html .= '</div>';
+
+	$end = microtime();
+	$html .= _ubc_healtcheck_insertTimerString($start, $end);
 
 	$html .= _ubc_healthcheck_insertStatusString(array($db_status, $files_status, $theme_status));
 	return $html;
@@ -190,6 +201,15 @@ function _ubc_healthcheck_megatronStatus() {
 
   curl_close($curl);
   return $ret;  
+}
+
+/* 
+ * Calculates script execution time
+ */
+function _ubc_healtcheck_insertTimerString($start, $end) {
+
+	$total = $end - $start;
+	return '<h4>Total Execution Time</h4><div>'.$total.' s</div>';
 }
 
 /*
