@@ -1,25 +1,26 @@
 <?php
 /*
  * @author UCB IT WebServices, May 28th 2015
- * 
+ *
  * This is a basic health check page that is monitored by SCOM.
- * 
+ *
  * Checks if the database is reachable and we can run a query.
  * Checks if the default Drupal files folder is reachable and writeable.
  * Checks if a CLF theme is installed and checks for CLF CDN assets.
- * 
+ *
  * SCOM checks for the STATUS_OK string to be present in the page.
  * The STATUS_OK string is included only if all health checks pass.
- * 
+ *
  * @file
  * Contains \Drupal\healthcheck\Monitor\StatusMonitor.
  */
 namespace Drupal\ubc_healthcheck\Monitor;
+use Drupal\Core\Site\Settings;
 define('STATUS_OK', 	'<!-- SCOM HEALTH CHECK STATUS OK -->');
 define('STATUS_ERR', 	'<!-- SCOM HEALTH CHECK STATUS ERR -->');
 define('CLF_ASSET_URL', 'http://cdn.ubc.ca/clf/7.0.4/js/ubc-clf.min.js');
 class StatusMonitor {
-  
+
   /*
    * Test the DB connection by querying the node table
    */
@@ -33,7 +34,7 @@ class StatusMonitor {
     }
     return FALSE;
   }
-  /* 
+  /*
    * Return the status of the DB connection test
    * @return $html string
    */
@@ -55,11 +56,9 @@ class StatusMonitor {
    */
   function getFilesStatus() {
     try {
-      $conf_path = \Drupal::service('site.path');
-      $files_path = \Drupal::config('file_public_path')->get($conf_path . '/files');
-      //$files_path = variable_get('file_public_path', $conf_path . '/files');
+      $files_path = Settings::get('file_public_path', \Drupal::service('site.path') . '/files');
       if(is_writable($files_path)) {
-        return 1;  	
+        return 1;
       }
     }
     catch(Exception $e) {
@@ -67,7 +66,7 @@ class StatusMonitor {
     }
     return FALSE;
   }
-  /* 
+  /*
    * Return the status of the File directory test
    * @return $html string
    */
@@ -88,7 +87,7 @@ class StatusMonitor {
    * Checks if CLF is enabled and if CDN assets are available
    */
   function getThemeStatus() {
-    try {  
+    try {
       //$themes = list_themes(TRUE);
       $themes = \Drupal::service('theme_handler')->listInfo();
     if(array_key_exists('galactus', $themes)) {
@@ -130,15 +129,15 @@ class StatusMonitor {
     $result = curl_exec($curl);
     $ret = false;
     if($result !== false) {
-      $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);  
+      $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if($statusCode == 200) {
           $ret = 1;
         }
     }
     curl_close($curl);
-    return $ret;  
+    return $ret;
   }
-  /* 
+  /*
    * Calculates script execution time
    */
   function insertTimerString($start, $end) {
