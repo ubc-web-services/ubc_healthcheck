@@ -14,7 +14,7 @@
  * @file
  * Contains \Drupal\healthcheck\Monitor\StatusMonitor.
  */
-namespace Drupal\healthcheck\Monitor;
+namespace Drupal\ubc_healthcheck\Monitor;
 define('STATUS_OK', 	'<!-- SCOM HEALTH CHECK STATUS OK -->');
 define('STATUS_ERR', 	'<!-- SCOM HEALTH CHECK STATUS ERR -->');
 define('CLF_ASSET_URL', 'http://cdn.ubc.ca/clf/7.0.4/js/ubc-clf.min.js');
