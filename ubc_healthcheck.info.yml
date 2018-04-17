@@ -1,0 +1,6 @@
+name: HealthCheck
+description: A page for monitoring systems to test the status of a site
+package: UBC IT Web Services
+
+type: module
+core: 8.x
