@@ -1,6 +1,7 @@
-name: HealthCheck
+name: UBC Health Check
 description: A page for monitoring systems to test the status of a site
-package: UBC IT Web Services
-
+package: UBC Web Services
+dependencies:
+  - smtp:smtp
 type: module
 core: 8.x

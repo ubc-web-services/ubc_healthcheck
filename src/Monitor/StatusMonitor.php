@@ -157,7 +157,7 @@ class StatusMonitor {
    * Sends an email to the test address
    */
   function sendEmail() {
-      $test_address = "test.address@example.com";
+      $test_address = "alice828ubc@gmail.com";
       $params['subject'] = t('Greetings!');
       $params['body'] = array(t('Greetings! If you receive this message it means your site is capable of using SMTP to send e-mail.'));
       $account = \Drupal::currentUser();
