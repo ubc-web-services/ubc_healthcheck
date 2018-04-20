@@ -181,7 +181,11 @@ class StatusMonitor {
     $files_status = $this->getFilesStatus();
     $theme_status = $this->getThemeStatus();
     # sends a test email if arg == 1
-    if($_GET["email"] == 1) $this->sendEmail();
+    if($_GET["email"] == 1) {
+      $this->sendEmail();
+    } else {
+      drupal_set_message(t('A test email has not been sent. Invalid argument.'), 'error');
+    }
     # do other types of status checks here
     $html = '<div id="statuses">';
     $html .= $this->setDBStatusHTML($db_status);
