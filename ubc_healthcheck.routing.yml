@@ -1,0 +1,16 @@
+
+healthcheck:
+  path: '/healthcheck/scom'
+  defaults:
+    _controller: '\Drupal\ubc_healthcheck\Monitor\StatusMonitor::content'
+    _title: 'Health Check for SCOM'
+  requirements:
+    _permission: 'access content'
+
+healthcheck.getDBstatus:
+  path: '/heathcheck/scom/getDB'
+  defaults:
+    _controller: '\Drupal\ubc_healthcheck\Monitor\StatusMonitor::getDBStatus'
+    _title: 'Get DB Status'
+  requirements:
+    _permission: 'access content'

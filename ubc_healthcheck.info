@@ -1,5 +1,0 @@
-name = UBC HealthCheck
-description = A page for monitoring systems to test the status of a site
-package = UBC IT Web Services
-core = 7.x
-version = "7.x-1.2"
