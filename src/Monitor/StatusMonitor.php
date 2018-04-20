@@ -154,6 +154,17 @@ class StatusMonitor {
     return STATUS_OK;
   }
   /*
+   * Sends an email to the test address
+   */
+  function sendEmail() {
+      $test_address = "test.address@example.com";
+      $params['subject'] = t('Greetings!');
+      $params['body'] = array(t('Greetings! If you receive this message it means your site is capable of using SMTP to send e-mail.'));
+      $account = \Drupal::currentUser();
+      \Drupal::service('plugin.manager.mail')->mail('smtp', 'smtp-test', $test_address, 'en', $params);
+      drupal_set_message(t('A test e-mail has been sent to @email via SMTP. You may want to check the log for any error messages.', ['@email' => $test_address]));
+  }
+  /*
    * Performs health checks and returns page html
    */
   public function content() {
@@ -169,6 +180,8 @@ class StatusMonitor {
     $db_status = $this->getDBStatus();
     $files_status = $this->getFilesStatus();
     $theme_status = $this->getThemeStatus();
+    # sends a test email if arg == 1
+    if($_GET["email"] == 1) $this->sendEmail();
     # do other types of status checks here
     $html = '<div id="statuses">';
     $html .= $this->setDBStatusHTML($db_status);
