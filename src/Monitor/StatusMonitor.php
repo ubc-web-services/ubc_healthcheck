@@ -199,4 +199,19 @@ class StatusMonitor {
       '#markup' => $html
     );
   }
+  /*
+   * Displays which host the site is being served from
+   */
+  public function host() {
+    $html = '';
+    if (getenv('BASE_URL') != FALSE) {
+      $html = "<h3>Hosted on Platform.sh</h3>";
+    }
+    else {
+      $html = "<h3>Hosted at UBC</h3>";
+    }
+    return array(
+      '#markup' => $html
+    );
+  }
 }

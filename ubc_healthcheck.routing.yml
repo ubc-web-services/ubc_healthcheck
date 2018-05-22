@@ -1,4 +1,3 @@
-
 healthcheck:
   path: '/healthcheck/scom'
   defaults:
@@ -7,8 +6,17 @@ healthcheck:
   requirements:
     _permission: 'access content'
 
+healthcheck.host:
+  path: '/healthcheck/host'
+  defaults:
+    _controller: '\Drupal\ubc_healthcheck\Monitor\StatusMonitor::host'
+    _title: 'Host'
+    _description: 'A page to verify the hosting environment'
+  requirements:
+    _permission: 'access content'
+
 healthcheck.getDBstatus:
-  path: '/heathcheck/scom/getDB'
+  path: '/healthcheck/scom/getDB'
   defaults:
     _controller: '\Drupal\ubc_healthcheck\Monitor\StatusMonitor::getDBStatus'
     _title: 'Get DB Status'
