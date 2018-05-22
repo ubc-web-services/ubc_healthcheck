@@ -29,9 +29,28 @@ function ubc_healthcheck_menu() {
 		'page callback' => 'ubc_healthcheck_scom',
 		'access arguments' => array('access content'),
 	);
+	$items['healthcheck/host'] = array(
+		'title' => 'Host',
+		'description' => 'A page to verify the hosting environment',
+		'page callback' => 'ubc_healthcheck_host',
+		'access arguments' => array('access content'),
+	);
 
 	return $items;
 }
+
+/*
+ * Displays which host the site is being served from
+ */
+function ubc_healthcheck_host() {
+
+	if (getenv('BASE_URL') != FALSE) {
+		return "<h3>Hosted on Platform.sh</h3>";
+	}
+	else {
+		return "<h3>Hosted at UBC</h3>";
+	}
+}	
 
 /*
  * Performs health checks and returns page html
