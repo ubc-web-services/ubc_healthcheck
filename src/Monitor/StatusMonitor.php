@@ -205,9 +205,11 @@ class StatusMonitor {
   public function host() {
     $html = '';
     if (getenv('BASE_URL') != FALSE) {
+      drupal_set_message(t('Hosted on Platform.sh'), 'status');
       $html = "<h3>Hosted on Platform.sh</h3>";
     }
     else {
+      drupal_set_message(t('Hosted at UBC'), 'warning');
       $html = "<h3>Hosted at UBC</h3>";
     }
     return array(
