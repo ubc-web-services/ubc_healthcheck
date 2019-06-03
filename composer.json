@@ -1,0 +1,10 @@
+{
+  "name": "ubc-web-services/ubc_healthcheck",
+  "description": "A Drupal 8 module that creates  a page for monitoring systems to test the status of a site",
+  "type": "drupal-module",
+  "authors": [{
+    "name": "Dave K",
+    "email": "david.kennedy@ubc.ca"
+  }],
+  "require": {}
+}
