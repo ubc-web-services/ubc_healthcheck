@@ -226,8 +226,9 @@ function _ubc_healthcheck_megatronStatus() {
  * Calculates script execution time
  */
 function _ubc_healtcheck_insertTimerString($start, $end) {
-
-	$total = $end - $start;
+	list($start_usec,) = explode(" ", $start);
+	list($end_usec,) = explode(" ", $end);
+	$total = $end_usec - $start_usec;
 	return '<h4>Total Execution Time</h4><div>'.$total.' s</div>';
 }
 
